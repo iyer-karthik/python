@@ -1,24 +1,21 @@
 # -*- coding: utf-8 -*-
-"""
-@author: Karthik Iyer
-"""
 def partial_dependence_plot_custom(gbrt, 
                                    target_variable_name, 
                                    label_name,
                                    X, 
                                    grid=None, 
                                    percentiles=(0.05, 0.95), 
-                                   grid_resolution=100,
-                                   **fig_kw):   
+                                   grid_resolution=100):   
     
     """Partial dependence plot for ``target_variable_name``
     Plots 1D Partial Dependence Plots for Gradient Goosted Classifiers.
-    Current functionality is not yet extended to Gradient Boosted Regressors
+    
+    [Current functionality is not yet extended to Gradient Boosted Regressors]
     
     Parameters
     ----------
     gbrt : BaseGradientBoosting
-        A fitted gradient boosting model.  
+        A fitted gradient boosting classification (binary or multilabel) model.  
         
     target_variable_name : str
         Name of the variable for which partial dependence plot is to be drawn.
@@ -34,16 +31,13 @@ def partial_dependence_plot_custom(gbrt,
         
     percentiles : (low, high), default=(0.05, 0.95)
         The lower and upper percentile used to create the extreme values
-        for the PDP axes.
-        
-    **fig_kw : dict
-        Dict with keywords passed to the plt.plot() call.
+        for the PDP axes..
         
     Returns
     -------
     fig : figure
         The Matplotlib Figure object.
-    axs : seq of Axis objects
+    ax : Axis object
         An Axis object, for the plot.
     
     """
@@ -74,24 +68,16 @@ def partial_dependence_plot_custom(gbrt,
                                           percentiles=percentiles, 
                                           grid_resolution=grid_resolution)
     
-    x_vals = x_vals.pop() # Get `target_variables` values. list.pop() is necessary
-                          # because of how partial_dependence() returns values.
+    x_vals = x_vals.pop() #Get `target_variables` values. list.pop() is necessary
+                          #because of how partial_dependence() returns values.
     
-    # Compute the probabilities for each class. Referenc:  Eqns (29) and (30) 
-    # in https://projecteuclid.org/download/pdf_1/euclid.aos/1013203451
+    #Compute the probabilities for each class. Referenc:  Eqns (29) and (30) 
+    #in https://projecteuclid.org/download/pdf_1/euclid.aos/1013203451
     odds = np.exp(log_odds)
     prob_array = odds/ odds.sum(axis=0)
     
-    # Plot one dimensional PDP for the label corresponding to `label_name`
-    title = fig_kw.pop('title')
-    xlabel = fig_kw.pop('xlabel')
-    ylabel = fig_kw.pop('ylabel')
-    
-    plt.figure(figsize=(12, 8))
-    plt.plot(x_vals, prob_array[label_idx], lw=1.5,**fig_kw)
+    #lot one dimensional PDP for the label corresponding to `label_name`
+    plt.figure(figsize=(12, 8)) #This hardcoded value provides good aspect-ratio
+    plt.plot(x_vals, prob_array[label_idx], lw=1.5)
     fig = plt.gcf()
-    for axis in fig.axes:
-        axis.set_title(title)
-        axis.xaxis.set_label_text(xlabel)
-        axis.yaxis.set_label_text(ylabel)
-    return fig, axis
+    return fig, fig.axes.pop()
