@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-def partial_dependence_plot_custom(gbrt, 
+def plot_partial_dependence_custom(gbrt, 
                                    target_variable_name, 
                                    label_name,
                                    X, 
-                                   grid=None, 
                                    percentiles=(0.05, 0.95), 
                                    grid_resolution=100):   
     
@@ -63,7 +62,7 @@ def partial_dependence_plot_custom(gbrt,
     
     log_odds, x_vals = partial_dependence(gbrt=gbrt, 
                                           target_variables=target_variable_idx, 
-                                          grid=grid, 
+                                          grid=None, 
                                           X=X, 
                                           percentiles=percentiles, 
                                           grid_resolution=grid_resolution)
@@ -80,4 +79,4 @@ def partial_dependence_plot_custom(gbrt,
     plt.figure(figsize=(12, 8)) #This hardcoded value provides good aspect-ratio
     plt.plot(x_vals, prob_array[label_idx], lw=1.5)
     fig = plt.gcf()
-    return fig, fig.axes.pop()
+    return fig, fig.axes[0]
