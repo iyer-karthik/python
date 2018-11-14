@@ -126,7 +126,7 @@ class PDP(object):
         _df[self.feature_name] = val
         return np.mean(predict(_df), axis=0).tolist()     
     
-    def plot_partial_dependence(self, label_name):
+    def plot_partial_dependence(self, label_name=None):
         
         """
         Plots partial dependence function for the label `label_name`. 
