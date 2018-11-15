@@ -1,3 +1,3 @@
-# python
+# Python
 
 Collection of Python utilities
