@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -*- author: Karthik Iyer -*-
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
@@ -32,7 +33,8 @@ class PDP(object):
         target feature `feature_name`
     """
     
-    def __init__(self, model, feature_name, training_df, n_classes=None, percentile=(0.05, 0.95), n_grid=100):
+    def __init__(self, model, feature_name, training_df, n_classes=None, 
+                 percentile=(0.05, 0.95), n_grid=100):
 
         self.model = model
         self.n_classes = n_classes 
@@ -61,7 +63,7 @@ class PDP(object):
             The partial dependence function evaluated on a grid of `n_grid` 
             equally spaced points of the target feature `feature_name`. The 
             max and min values of the grid are specified through the 
-            `percentile` parameter of the object.
+            `percentile` parameter of the PDP class instance.
             
             For regression ``no_of_classes==1``. For classification, 
             ``no_of_classes == n_classes``
@@ -87,7 +89,7 @@ class PDP(object):
             x_vals = x_vals[0] # Get a grid of x axis values
                                   
             if self.n_classes is None: # Regression
-                return pdp, x_vals
+                return pdp.T, x_vals
             else: 
                 # Compute the probabilities for each class. Reference:  Eqns (29) and (30) 
                 # in https://projecteuclid.org/download/pdf_1/euclid.aos/1013203451
@@ -135,7 +137,7 @@ class PDP(object):
         ----------
         label_name: str
             Name of the label for which partial dependence function is to be 
-            plotted. Defaults to None which corresponds to a regressor
+            plotted. Defaults to None, which corresponds to a regressor.
         
         Returns
         -------
