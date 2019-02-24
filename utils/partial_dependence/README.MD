@@ -4,7 +4,7 @@ PDPs provide a way to look at the directionality of feature(s) with respect to t
 
 PDPs help visualize the relationship between a subset of features (typically 1-2) and the response, while accounting for the average effect of the other predictors in the model.
 
-sklearn currently (as of Feb 2019) implements partial dependence plots only for gradient boosted trees. The goal of this project is to extend sklearn's partial dependence functionality to any classifer and any regressor.
+`scikit-learn` currently (as of Feb 2019) implements partial dependence plots only for gradient boosted trees. The goal of this project is to extend sklearn's partial dependence functionality to any classifer and any regressor.
 
 ***References***
 
