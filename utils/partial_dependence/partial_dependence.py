@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # -*- author: Karthik Iyer -*-
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 plt.style.use('fivethirtyeight')
 
 class PartialDependence(object):
@@ -35,17 +35,9 @@ class PartialDependence(object):
 
     Methods
     ------
-    calculate(): 
-        Calculate partial dependence function for `feature_name`,
-            returns (pd_vals, x_vals)
-            pd_vals: a numpy array of predicted partial dependence function values
-            x_vals: a numpy array of grid points
-    
-    plot_partial_dependence(label):
-        Plot partial dependence function for the given label,
-            returns (fig, ax)
-            fig: matplotlib figure object
-            ax: axid object for the plot
+    calculate(): Calculate partial dependence function for `feature_name`
+
+    plot_partial_dependence(label): Plot 1D partial dependence function for the given label
 
     """
 
@@ -59,6 +51,7 @@ class PartialDependence(object):
         self.n_grid = n_grid
         self._check_data()
         
+    
     def _check_data(self):
         """
         Helper function to check that the partial dependence object is correctly instantiated.
@@ -70,9 +63,6 @@ class PartialDependence(object):
             AssertionError -- if `training_df` is not a pandas dataframe
         """
 
-        from sklearn.utils.estimator_checks import check_estimator
-        check_estimator(self.model) # Check if estimator adheres to scikit-learn conventions
-
         assert(isinstance(self.training_df, pd.core.frame.DataFrame)), \
             '`training_df` must be a pandas dataframe'
 
@@ -83,10 +73,12 @@ class PartialDependence(object):
             raise ValueError('target variable `%s` is not a feature' \
                              % str(self.feature_name))
             
-        valid_dtypes = ['float64', 'int64', 'category', 'bool']
-        if self.feature_name not in self.training_df.select_dtypes(include=valid_dtypes).columns:
+        valid_dtypes = ['float64', 'int64', 'float32', 'int32', 'category', 'bool']
+        if self.feature_name not in \
+            self.training_df.select_dtypes(include=valid_dtypes).columns:
             raise ValueError('Type of target feature must be one of float64, int64, category or bool')
                 
+    
     def calculate(self):
         
         """
@@ -114,6 +106,7 @@ class PartialDependence(object):
             pd_vals, x_vals = self._calc_partial_dependence_custom()
         return pd_vals, x_vals
     
+    
     def _calc_partial_dependence_gbt(self):
         
         """
@@ -139,7 +132,8 @@ class PartialDependence(object):
             prob_vals = odds / odds.sum(axis=0)
             return prob_vals, x_vals
         return pd_vals.T, x_vals # Regression model
-    
+
+       
     def _calc_partial_dependence_custom(self):
         
         """
@@ -153,7 +147,7 @@ class PartialDependence(object):
         
         # Build a grid of feature values. If feature is non-categorical use equally 
         # spaced points b/w given percentile values. Otherwise use all possible values.)
-        if self.feature_name in _df.select_dtypes(include=['float64', 'int64']).columns:
+        if self.feature_name in _df.select_dtypes(include=['float64', 'int64', 'float32', 'int32']).columns:
             lower_limit = np.percentile(_df[self.feature_name], self.percentile[0]*100)
             upper_limit = np.percentile(_df[self.feature_name], self.percentile[1]*100)
             x_vals = np.linspace(start=lower_limit, stop=upper_limit, num=self.n_grid)
@@ -162,8 +156,8 @@ class PartialDependence(object):
 
         # Get the mean prediction    
         pd_vals = np.asarray([self._get_mean_prediction(_df, predict, val) for val in x_vals]).T
-
         return pd_vals, x_vals
+    
     
     def _get_mean_prediction(self, _df, predict, val):
         
@@ -173,6 +167,7 @@ class PartialDependence(object):
         
         _df[self.feature_name] = val
         return np.mean(predict(_df), axis=0).tolist()     
+    
     
     def _check_label(self, label):
         """
@@ -192,9 +187,9 @@ class PartialDependence(object):
             elif isinstance(label, int) and label not in range(len(self.model.classes_)):
                 raise ValueError('label `%s` not a valid label index' % str(label))
         else:
-            assert(label == 0), \
-                'For regression model label=0'
+            assert(label == 0), 'For regression model label=0'
 
+    
     def plot_partial_dependence(self, label=0):
         
         """
@@ -215,11 +210,10 @@ class PartialDependence(object):
             An Axis object, for the plot.
         """
         
+        self._check_label(label)
         print("Calculating partial dependence function")
         pd_vals, x_vals = self.calculate() 
         print("Finished")
-        
-        self._check_label(label)
         
         # Plot one dimensional PDP
         plt.figure(figsize=(12, 8)) # This hardcoded value provides good aspect-ratio
@@ -233,4 +227,3 @@ class PartialDependence(object):
             plt.plot(x_vals, pd_vals, lw=1.5)
             fig = plt.gcf()
         return fig, fig.axes[0]
-    
