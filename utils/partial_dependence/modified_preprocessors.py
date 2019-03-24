@@ -2,8 +2,8 @@
 # -*- author: Karthik Iyer -*-
 """
 Most scikit-learn transformers output a numpy ndarray regardless of the
-original datatype and if put in a pipeline this datatype is lost. We will
-modify the transform() method for some of these transformers so that
+original datatype. If put in a pipeline this datatype is lost. In this script
+we aim modify the transform() method for some of these transformers so that
 they return a pandas dataframe if the fit() method is called on a dataframe. 
 This is especially important if we wish to do some feature importance analysis
 later on. 
