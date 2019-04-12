@@ -136,7 +136,8 @@ class PartialDependence(object):
             AssertionError -- for regression models, label must be 0
         """
 
-        if hasattr(self.model, 'predict_proba'): # Classification model; check correctness of label
+        if hasattr(self.model, 'predict_proba'): # Classification model; 
+                                                 # check correctness of label
             if isinstance(label, str) and label not in self.model.classes_:
                 raise ValueError('label `%s` not a valid label' % str(label))
             elif isinstance(label, int) and label not in \
