@@ -7,7 +7,13 @@ plt.style.use('fivethirtyeight')
 
 class PartialDependence(object):
     """
-    Creates a partial dependence object for a given target feature.
+    Custom class for calculating and plotting Partial Dependence plots giving
+    more flexibility compared to sklearn's implementation. 
+
+    Partial dependence plots show the dependence between the target function 
+    and a set of ‘target’ features, marginalizing over the values of 
+    all other features (the complement features)
+
     Algorithm for partial dependence taken from section 8.2 in 
     https://projecteuclid.org/euclid.aos/1013203451
     
@@ -15,7 +21,7 @@ class PartialDependence(object):
     ----------
     model : scikit-learn model object
         A scikit learn classifier or a regressor object.
-        classifer must implement predict_proba() method
+        If classifier, then it must implement predict_proba() method
              
     feature_name: str
         The name of the target feature(s) for which partial dependence plots are 
@@ -33,12 +39,6 @@ class PartialDependence(object):
         The lower and upper percentile used to create the extreme value for 
         target feature `feature_name`. 
 
-    Methods
-    ------
-    calculate(): Calculate partial dependence function for `feature_name`
-
-    plot_partial_dependence(label): Plot 1D partial dependence function for the given label
-
     """
 
     def __init__(self, model, feature_name, training_df, 
@@ -50,16 +50,18 @@ class PartialDependence(object):
         self.percentile = percentile
         self.n_grid = n_grid
         self._check_data()
-        
-    
+
+
     def _check_data(self):
         """
-        Helper function to check that the partial dependence object is correctly instantiated.
+        Helper function to check that the partial dependence object is 
+        correctly instantiated.
         
         Raises:
             ValueError -- if target variable is not provided
             ValueError -- if target variable is not a valid feature
-            ValueError -- if target feature is not one of ['float64', 'int64', 'category', 'bool']
+            ValueError -- if target feature is not one of ['float64', \
+                          'int64', 'category', 'bool']
             AssertionError -- if `training_df` is not a pandas dataframe
         """
 
@@ -76,9 +78,74 @@ class PartialDependence(object):
         valid_dtypes = ['float64', 'int64', 'float32', 'int32', 'category', 'bool']
         if self.feature_name not in \
             self.training_df.select_dtypes(include=valid_dtypes).columns:
-            raise ValueError('Type of target feature must be one of float64, int64, category or bool')
+            raise ValueError('Type of target feature must be one of float64, \
+                              int64, category or bool')
                 
+       
     
+    def plot_partial_dependence(self, label=0):
+        """
+        Plots partial dependence function for the given label
+        
+        Parameters
+        ----------
+        label_name: str or int
+            Name of the label or label index for which partial dependence \
+            function is to be plotted. Defaults to integer 0, which corresponds \
+            to the first label for classifier models or the predicted target 
+            for regressor models.
+        
+        Returns
+        -------
+        fig : figure
+            The Matplotlib Figure object.
+        ax : Axis object
+            An Axis object, for the plot.
+        """
+        
+        self._check_label(label)
+        print("Calculating partial dependence function")
+        pd_vals, x_vals = self.calculate() 
+        print("Finished")
+        
+        # Plot one dimensional PDP
+        plt.figure(figsize=(12, 8)) # This hardcoded value provides good aspect-ratio
+        print("Plotting partial dependence function for the given label")
+        
+        if hasattr(self.model, 'predict_proba'): 
+            label_idx = list(self.model.classes_).index(label) if \
+                isinstance(label, str) else label
+            plt.plot(x_vals, pd_vals[label_idx], lw=1.5)
+            fig = plt.gcf()
+        else: 
+            plt.plot(x_vals, pd_vals, lw=1.5)
+            fig = plt.gcf()
+        return fig, fig.axes[0]
+        
+    def _check_label(self, label):
+        """
+        Helper function to check that label to partial dependence \
+            plotter is passed correcty.
+        
+        Arguments:
+            label {[int or str]} -- label name of label index
+        
+        Raises:
+            ValueError -- if label name doesn't exist or if label index is \
+                incorrect
+            AssertionError -- for regression models, label must be 0
+        """
+
+        if hasattr(self.model, 'predict_proba'): # Classification model; check correctness of label
+            if isinstance(label, str) and label not in self.model.classes_:
+                raise ValueError('label `%s` not a valid label' % str(label))
+            elif isinstance(label, int) and label not in \
+                    range(len(self.model.classes_)):
+                raise ValueError('label `%s` not a valid label index' % str(label))
+        else:
+            assert(label == 0), 'For regression model label=0'
+
+        
     def calculate(self):
         
         """
@@ -143,19 +210,25 @@ class PartialDependence(object):
         _df = self.training_df.copy()
         
         # Get a prediction object from the trained model
-        predict = self.model.predict_proba if hasattr(self.model, 'predict_proba') else self.model.predict
+        predict = self.model.predict_proba if hasattr(self.model, 'predict_proba')\
+            else self.model.predict
         
         # Build a grid of feature values. If feature is non-categorical use equally 
         # spaced points b/w given percentile values. Otherwise use all possible values.)
-        if self.feature_name in _df.select_dtypes(include=['float64', 'int64', 'float32', 'int32']).columns:
-            lower_limit = np.percentile(_df[self.feature_name], self.percentile[0]*100)
-            upper_limit = np.percentile(_df[self.feature_name], self.percentile[1]*100)
-            x_vals = np.linspace(start=lower_limit, stop=upper_limit, num=self.n_grid)
+        if self.feature_name in _df.select_dtypes(include=['float64', 'int64', \
+                                        'float32', 'int32']).columns:
+            lower_limit = np.percentile(_df[self.feature_name], 
+                                        self.percentile[0]*100)
+            upper_limit = np.percentile(_df[self.feature_name], 
+                                        self.percentile[1]*100)
+            x_vals = np.linspace(start=lower_limit, stop=upper_limit, 
+                                 num=self.n_grid)
         else: 
             x_vals = _df[self.feature_name].unique()
 
         # Get the mean prediction    
-        pd_vals = np.asarray([self._get_mean_prediction(_df, predict, val) for val in x_vals]).T
+        pd_vals = np.asarray([self._get_mean_prediction(_df, predict, val) \
+                              for val in x_vals]).T
         return pd_vals, x_vals
     
     
@@ -168,62 +241,3 @@ class PartialDependence(object):
         _df[self.feature_name] = val
         return np.mean(predict(_df), axis=0).tolist()     
     
-    
-    def _check_label(self, label):
-        """
-        Helper function to check that label to partial dependence plotter is passed correcty.
-        
-        Arguments:
-            label {[int or str]} -- label name of label index
-        
-        Raises:
-            ValueError -- if label name doesn't exist or if label index is incorrect
-            AssertionError -- for regression models, label must be 0
-        """
-
-        if hasattr(self.model, 'predict_proba'): # Classification model; check correctness of label
-            if isinstance(label, str) and label not in self.model.classes_:
-                raise ValueError('label `%s` not a valid label' % str(label))
-            elif isinstance(label, int) and label not in range(len(self.model.classes_)):
-                raise ValueError('label `%s` not a valid label index' % str(label))
-        else:
-            assert(label == 0), 'For regression model label=0'
-
-    
-    def plot_partial_dependence(self, label=0):
-        
-        """
-        Plots partial dependence function for the given label
-        
-        Parameters
-        ----------
-        label_name: str or int
-            Name of the label or label index for which partial dependence function is to be 
-            plotted. Defaults to integer 0, which corresponds to the first label for
-            classifier models or the predicted target for regressor models.
-        
-        Returns
-        -------
-        fig : figure
-            The Matplotlib Figure object.
-        ax : Axis object
-            An Axis object, for the plot.
-        """
-        
-        self._check_label(label)
-        print("Calculating partial dependence function")
-        pd_vals, x_vals = self.calculate() 
-        print("Finished")
-        
-        # Plot one dimensional PDP
-        plt.figure(figsize=(12, 8)) # This hardcoded value provides good aspect-ratio
-        print("Plotting partial dependence function for the given label")
-        
-        if hasattr(self.model, 'predict_proba'): 
-            label_idx = list(self.model.classes_).index(label) if isinstance(label, str) else label
-            plt.plot(x_vals, pd_vals[label_idx], lw=1.5)
-            fig = plt.gcf()
-        else: 
-            plt.plot(x_vals, pd_vals, lw=1.5)
-            fig = plt.gcf()
-        return fig, fig.axes[0]
