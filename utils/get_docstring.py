@@ -31,12 +31,12 @@ from collections import namedtuple
 
 def get_all_class_name_and_docstrings(code_text):
     """Extract all class names and associated class level
-    docstrings from given code. 
+    docstrings from given code. Works for nested classes too.
 
     Given a text of syntactically correct Python code this utility function 
-    extracts names of all classes and their class level docstrings. This 
+    extracts names of all classes and associated class level docstrings. This 
     function returns a list of namedtuples each element of which contains class 
-    level meta-information for every class deteced. Works for nested classes. 
+    level meta-information for every class deteced. 
 
     Parameters
     ----------
@@ -47,7 +47,7 @@ def get_all_class_name_and_docstrings(code_text):
     Returns
     -------
     [ClassDetails]: List of namedtuples
-        A list of namedtuple called ClassDetails. Each ClassDetail
+        A list of namedtuple called ClassDetails. Each ClassDetails
         object has the following attributes:
         name - name of class (str)
         docstring - docstring of class (str)
@@ -70,13 +70,13 @@ def get_all_class_name_and_docstrings(code_text):
 
 def get_all_function_details(code_text: str):
     """Extract all function names, associated arguments and associated 
-    docstrings from given code. 
+    docstrings from given code. Works for nested functions and methods too.
 
     Given a text of syntactically correct Python code this utlitiy function 
     extracts names of all functions and methods, their respective arguments and 
     docstrings. This function returns a list of namedtuples each element of 
     which contains functional meta-information for every function/ method 
-    detected. Works for nested functions and methods. 
+    detected.  
 
     Parameters
     ----------
@@ -87,7 +87,7 @@ def get_all_function_details(code_text: str):
     Returns
     -------
     [FunctionDetails]: List of namedtuples
-        A list of namedtuple called FunctionDetails. Each FunctionDetail
+        A list of namedtuple called FunctionDetails. Each FunctionDetails
         object has the following attributes:
         name - name of function/ method (str)
         args - set of all arguments to the function/ method (Set(Str))
