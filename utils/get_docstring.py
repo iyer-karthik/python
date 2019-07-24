@@ -2,6 +2,8 @@
 function/method levelinformation (name, arguments and docstring) from a given piece 
 of Python code text. 
 """
+
+#from functools import reduce
 import ast
 from itertools import chain
 from collections import namedtuple
@@ -27,34 +29,33 @@ from collections import namedtuple
 #                 class_definition_node_body[0].body)
 
 
-def get_all_class_name_and_docstrings(code_text):
+def get_all_class_name_and_docstrings(source_code: str):
     """Extract all class names and associated class level
     docstrings from given code. Works for nested classes too.
 
     Given a text of syntactically correct Python code this utility function 
     extracts names of all classes and associated class level docstrings. This 
     function returns a list of namedtuples each element of which contains class 
-    level meta-information for every class deteced. 
+    level meta-information for every class detected. Returns an empty list if
+    no class is detected.
 
     Parameters
     ----------
-    code_text: str
+    source_code : str
         String containing Python code
 
     Returns
     -------
-    [ClassDetails]: List of namedtuples
+    [ClassDetails] : List of namedtuples
         A list of namedtuple called ClassDetails. Each ClassDetails
         object has the following attributes:
         name - name of class (str)
         docstring - docstring of class (str)
-    
-    Returns an empty list if the given code does not contain any class.
     """
     ClassDetails = namedtuple("ClassDetails", ["name", "docstring"])
     
     # Parse the code text to get the starting node of the AST
-    starting_node = ast.parse(code_text)
+    starting_node = ast.parse(source_code)
     
     # Recursively yield all descendant nodes in the tree starting at `starting_node`
     # Used and exhausted exactly once afterwards, so okay to load lazily. 
@@ -65,7 +66,7 @@ def get_all_class_name_and_docstrings(code_text):
             if isinstance(node, ast.ClassDef)]
 
 
-def get_all_function_details(code_text: str):
+def get_all_function_details(source_code: str):
     """Extract all function names, associated arguments and associated 
     docstrings from given code. Works for nested functions and methods too.
 
@@ -73,11 +74,12 @@ def get_all_function_details(code_text: str):
     extracts names of all functions and methods, their respective arguments and 
     docstrings. This function returns a list of namedtuples each element of 
     which contains functional meta-information for every function/ method 
-    detected.  
+    detected. Returns an empty list if the given code does not contain any methods/
+    functions.
 
     Parameters
     ----------
-    code_text: str
+    source_code: str
         String containing Python code
 
     Returns
@@ -88,14 +90,11 @@ def get_all_function_details(code_text: str):
         name - name of function/ method (str)
         args - set of all arguments to the function/ method (Set(Str))
         docstring - docstring of function/ method (str)
-    
-    Returns an empty list if the given code does not contain any methods/
-    functions.
     """
     FunctionDetails = namedtuple("FunctionDetails", ["name", "args", "docstring"])
     
     # Parse the code text to get the starting node of the AST
-    starting_node = ast.parse(code_text)
+    starting_node = ast.parse(source_code)
     
     # Recursively yield all descendant nodes in the tree starting at `starting_node`
     # Used and exhausted exactly once afterwards, so okay to load lazily. 
