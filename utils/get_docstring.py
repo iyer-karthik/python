@@ -2,8 +2,6 @@
 function/method levelinformation (name, arguments and docstring) from a given piece 
 of Python code text. 
 """
-
-#from functools import reduce
 import ast
 from itertools import chain
 from collections import namedtuple
@@ -40,7 +38,6 @@ def get_all_class_name_and_docstrings(code_text):
 
     Parameters
     ----------
-    
     code_text: str
         String containing Python code
 
@@ -80,7 +77,6 @@ def get_all_function_details(code_text: str):
 
     Parameters
     ----------
-    
     code_text: str
         String containing Python code
 
