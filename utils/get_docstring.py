@@ -29,15 +29,14 @@ from collections import namedtuple
 #                 class_definition_node_body[0].body)
 
 
-def get_all_class_name_and_docstrings(source_code: str):
+def get_all_class_name_and_docstrings(source_code):
     """Extract all class names and associated class level
     docstrings from given code. Works for nested classes too.
 
     Given a text of syntactically correct Python code this utility function 
     extracts names of all classes and associated class level docstrings. This 
     function returns a list of namedtuples each element of which contains class 
-    level meta-information for every class detected. Returns an empty list if
-    no class is detected.
+    level meta-information for every class deteced. 
 
     Parameters
     ----------
@@ -51,6 +50,8 @@ def get_all_class_name_and_docstrings(source_code: str):
         object has the following attributes:
         name - name of class (str)
         docstring - docstring of class (str)
+    
+    Returns an empty list if the given code does not contain any class.
     """
     ClassDetails = namedtuple("ClassDetails", ["name", "docstring"])
     
@@ -74,8 +75,7 @@ def get_all_function_details(source_code: str):
     extracts names of all functions and methods, their respective arguments and 
     docstrings. This function returns a list of namedtuples each element of 
     which contains functional meta-information for every function/ method 
-    detected. Returns an empty list if the given code does not contain any methods/
-    functions.
+    detected.  
 
     Parameters
     ----------
@@ -90,6 +90,9 @@ def get_all_function_details(source_code: str):
         name - name of function/ method (str)
         args - set of all arguments to the function/ method (Set(Str))
         docstring - docstring of function/ method (str)
+    
+    Returns an empty list if the given code does not contain any methods/
+    functions.
     """
     FunctionDetails = namedtuple("FunctionDetails", ["name", "args", "docstring"])
     
