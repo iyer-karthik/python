@@ -3,7 +3,6 @@ function/method levelinformation (name, arguments and docstring) from a given pi
 of Python code text. 
 """
 
-#from functools import reduce
 import ast
 from itertools import chain
 from collections import namedtuple
