@@ -1,4 +1,4 @@
-function_docstring_example = """
+FUNCTION_DOCSTRING_TEMPLATE = """
     <One line function description here>
 
     <More detailed description here>
@@ -6,9 +6,9 @@ function_docstring_example = """
     Parameters
     ----------
     param1 : <replace by type of parameter> 
-        <The first parameter. More detailed description>
+        <More detailed description>
     param2 : <replace by type of parameter>
-        <The second parameter. More detailed description>
+        <More detailed description>
 
     Returns
     -------
@@ -16,11 +16,10 @@ function_docstring_example = """
         True if successful, False otherwise.
     
     
-    Raises <Include this if function raises exception errors>
+    Raises <Include this if function raises errors>
     ------
     AttributeError
-        <The ``Raises`` section is a list of all exceptions
-        that are relevant to the interface.>
+        <Some explanation goes here>
     ValueError
         <If `param2` is equal to `param1`.>
 
@@ -45,4 +44,23 @@ function_docstring_example = """
     tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
     quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo 
     consequat.
+    """
+
+CLASS_DOCSTRING_TEMPLATE = """
+    <Class description here>
+    
+    Parameters <Constructor Parameters>
+    ----------
+    param1 : <replace by type of parameter> 
+        <The first parameter. More detailed description>
+    param2 : <replace by type of parameter>
+        <The second parameter. More detailed description>
+
+    
+    Attributes
+    ----------
+    attr1 : <replace by type of parameter> 
+        <More detailed description>
+    attr2 : <replace by type of parameter> 
+        <More detailed description>
     """
