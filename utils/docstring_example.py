@@ -6,27 +6,21 @@ FUNCTION_DOCSTRING_TEMPLATE = """
     Parameters
     ----------
     param1 : <replace by type of parameter> 
-        <More detailed description>
+        <Detailed description>
     param2 : <replace by type of parameter>
-        <More detailed description>
+        <Detailed description>
 
     Returns
     -------
     return_value : <replace by return value type> 
-        True if successful, False otherwise.
-    
+        <Detailed description?
     
     Raises <Include this if function raises errors>
     ------
     AttributeError
         <Some explanation goes here>
     ValueError
-        <If `param2` is equal to `param1`.>
-
-    Yields <Only include this if function is a generator.>
-    ------
-    int
-        <The next number in the range of 0 to 100.>
+        <Some explanation goes here>
 
     Examples
     --------
@@ -46,6 +40,31 @@ FUNCTION_DOCSTRING_TEMPLATE = """
     consequat.
     """
 
+GENERATOR_DOCSTRING_TEMPLATE = """
+    <One line generator description here>
+
+    <More detailed description here>
+
+    Parameters
+    ----------
+    param1 : <replace by type of parameter> 
+        <More detailed description>
+    param2 : <replace by type of parameter>
+        <More detailed description>
+
+    Yields 
+    ------
+    int
+        <Some description goes here>
+    
+    Raises <Include this if generator raises errors>
+    ------
+    AttributeError
+        <Some explanation goes here>
+    ValueError
+        <Some explanation goes here>
+    """
+
 CLASS_DOCSTRING_TEMPLATE = """
     <Class description here>
     
@@ -55,7 +74,6 @@ CLASS_DOCSTRING_TEMPLATE = """
         <The first parameter. More detailed description>
     param2 : <replace by type of parameter>
         <The second parameter. More detailed description>
-
     
     Attributes
     ----------
