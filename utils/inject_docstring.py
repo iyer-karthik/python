@@ -13,8 +13,9 @@ import sys
 class DocstringInjector(ast.NodeTransformer):
     """Injects docstring in Python source code.
 
-    Detects functions/ methods/ generators/classes in python source code
-    and injects associated templated docstrings if none exist.
+    Uses Python AST (Abstract Syntax Tree) to detect functions/ methods/ 
+    generators/classes in Python source code and to modify source code by 
+    injecting associated templated docstrings if none detected.
 
     Note: Only non-private functions/ methods are modified. Modification 
     happens inplace.
@@ -23,7 +24,6 @@ class DocstringInjector(ast.NodeTransformer):
     --------
     >>> filepath = 'your_python_source_filepath'
     >>> DocstringInjector.inject_templated_docstring(filepath)
-    OneHotEncoder(handle_unknown='ignore')
     """
 
     # Helper function to modify Python AST. 
@@ -54,7 +54,8 @@ class DocstringInjector(ast.NodeTransformer):
         if isinstance(node, ast.ClassDef):
             if not isinstance(_first_node, ast.Expr):
                 _expr_node = ast.Expr(value=ast.Str(s=CLASS_DOCSTRING_TEMPLATE))
-                node.body.insert(0, _expr_node) # Insert docstring at the first child node
+                node.body.insert(0, _expr_node) # Insert docstring at the 
+                                                # first child node
                 ast.fix_missing_locations(node) # Line offset   
             return node
         
@@ -64,14 +65,16 @@ class DocstringInjector(ast.NodeTransformer):
                    for descendent_node in ast.walk(node)):
                 if not isinstance(_first_node, ast.Expr):
                     _expr_node = ast.Expr(value=ast.Str(s=GENERATOR_DOCSTRING_TEMPLATE))
-                    node.body.insert(0, _expr_node) # Insert docstring at the first child node
+                    node.body.insert(0, _expr_node) # Insert docstring at the 
+                                                    # first child node
                     ast.fix_missing_locations(node) # Line offset   
 
             # Otherwise inject usual function docstring template
             else:
                 if not isinstance(_first_node, ast.Expr):
                     _expr_node = ast.Expr(value=ast.Str(s=FUNCTION_DOCSTRING_TEMPLATE))
-                    node.body.insert(0, _expr_node) # Insert docstring at the first child node
+                    node.body.insert(0, _expr_node) # Insert docstring at the 
+                                                    # first child node
                     ast.fix_missing_locations(node) # Line offset   
             return node
     
