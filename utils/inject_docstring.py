@@ -28,7 +28,7 @@ class DocstringInjector(ast.NodeTransformer):
 
     # Helper function to modify Python AST. 
     @staticmethod
-    def _modify_node(node):
+    def _modify_node(node, templated_docstring: str):
         """Visits a node in an abstract syntax tree, detects if it is a node
            corresponding to a function or a class definition and transforms
            the node by injecting templated docstring if no docstring is 
@@ -46,43 +46,17 @@ class DocstringInjector(ast.NodeTransformer):
             class node; existing node otherwise
         """
 
-        if not (isinstance(node, ast.ClassDef) or isinstance(node, ast.FunctionDef)):
-            raise ValueError("Can only modify a class or a function/ method node")
-        
-        _first_node, *_ = node.body  # First node is of the type `ast.Expr` iff 
-                                     # no docstring exists
-        if isinstance(node, ast.ClassDef):
-            if not isinstance(_first_node, ast.Expr):
-                _expr_node = ast.Expr(value=ast.Str(s=CLASS_DOCSTRING_TEMPLATE))
-                node.body.insert(0, _expr_node) # Insert docstring at the 
-                                                # first child node
-                ast.fix_missing_locations(node) # Line offset   
-            return node
-        
-        elif isinstance(node, ast.FunctionDef):
-            # Detect if the function is a generator. Inject yield template. 
-            if any(isinstance(descendent_node, ast.Yield) 
-                   for descendent_node in ast.walk(node)):
-                if not isinstance(_first_node, ast.Expr):
-                    _expr_node = ast.Expr(value=ast.Str(s=GENERATOR_DOCSTRING_TEMPLATE))
-                    node.body.insert(0, _expr_node) # Insert docstring at the 
-                                                    # first child node
-                    ast.fix_missing_locations(node) # Line offset   
-
-            # Otherwise inject usual function docstring template
-            else:
-                if not isinstance(_first_node, ast.Expr):
-                    _expr_node = ast.Expr(value=ast.Str(s=FUNCTION_DOCSTRING_TEMPLATE))
-                    node.body.insert(0, _expr_node) # Insert docstring at the 
-                                                    # first child node
-                    ast.fix_missing_locations(node) # Line offset   
-            return node
-    
+        if not ast.get_docstring(node):
+            _expr_node = ast.Expr(value=ast.Str(s=templated_docstring))
+            node.body.insert(0, _expr_node) # Insert docstring at the 
+                                            # first child node
+            ast.fix_missing_locations(node) # Line offset  
         return node
+
 #-------------------------------------------------------------------------------
 # Functions that modify source code
     @staticmethod
-    def add_templated_docstring_to_source(source_code):
+    def add_templated_docstring_to_source(source_code: str):
         """Add templated docstring to given Python code
         
         Given Python code this function detects all functions/ methods and 
@@ -109,17 +83,23 @@ class DocstringInjector(ast.NodeTransformer):
         _starting_node = ast.parse(source_code)
         _all_descendent_nodes = ast.walk(_starting_node)
 
-        # Only injects templated docstring if none found. Only non-private 
-        # methods/ functions and classes get injected. 
+        # Only inject templated docstring if none found. Only non-private 
+        # methods/ functions and classes get modified.
         for node in _all_descendent_nodes:
-            modify_node_bool = (isinstance(node, ast.FunctionDef) and\
-                                not(node.name.startswith('__')) or\
-                                isinstance(node, ast.ClassDef))
-            
-            if modify_node_bool:
-                DocstringInjector._modify_node(node)
+            if isinstance(node, ast.FunctionDef) and not(node.name.startswith('__')):
+                # Detect if node corresponds to a generator or a normal function
+                if any(isinstance(descendent_node, ast.Yield)\
+                       for descendent_node in ast.walk(node)):
+                    DocstringInjector._modify_node(node, 
+                        templated_docstring=GENERATOR_DOCSTRING_TEMPLATE)
+                DocstringInjector._modify_node(node,
+                    templated_docstring=FUNCTION_DOCSTRING_TEMPLATE)
+                
+            elif isinstance(node, ast.ClassDef):
+                DocstringInjector._modify_node(node,
+                    templated_docstring=CLASS_DOCSTRING_TEMPLATE)
 
-        # Covert the modified AST back to source code
+        # Convert the modified AST back to source code
         modified_source_code = astor.to_source(node=_starting_node)
         return modified_source_code
 
@@ -166,7 +146,7 @@ class DocstringInjector(ast.NodeTransformer):
             modified_fstr = DocstringInjector.add_templated_docstring_to_source(source_code=fstr)
             with open(filepath, 'w') as f:
                 f.write(modified_fstr)
-            print("Modified source succesfully")
+            print("Modified source succesfully!")
         except (ImportError, IndentationError, SyntaxError):
             raise
 #-------------------------------------------------------------------------------
