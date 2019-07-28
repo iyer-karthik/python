@@ -105,7 +105,6 @@ class DocstringInjector(ast.NodeTransformer):
 
     @staticmethod
     def inject_templated_docstring(filepath: str):
-
         """Inject docstring inplace to a file containing Python code
         
         Given a filepath that contains Python code function detects all 
