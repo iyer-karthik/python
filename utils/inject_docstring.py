@@ -53,7 +53,7 @@ class DocstringInjector(ast.NodeTransformer):
             ast.fix_missing_locations(node) # Line offset  
         return node
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Functions that modify source code
     @staticmethod
     def add_templated_docstring_to_source(source_code: str):
@@ -61,8 +61,8 @@ class DocstringInjector(ast.NodeTransformer):
         
         Given Python code this function detects all functions/ methods and 
         classes in the code, checks if the each of the functions/ methods and 
-        classes have docstrings and injects associated templated docstring if no 
-        docstring exists. This injection is done only for non-private 
+        classes have docstrings and injects associated templated docstring if 
+        no docstring exists. This injection is done only for non-private 
         functions/methods.
 
         This function only potentially modifies a given piece of code if 
@@ -102,6 +102,7 @@ class DocstringInjector(ast.NodeTransformer):
         # Convert the modified AST back to source code
         modified_source_code = astor.to_source(node=_starting_node)
         return modified_source_code
+
 
     @staticmethod
     def inject_templated_docstring(filepath: str):
