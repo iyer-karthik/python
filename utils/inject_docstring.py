@@ -14,7 +14,7 @@ class DocstringInjector(ast.NodeTransformer):
     """Injects docstring in Python source code.
 
     Uses Python AST (Abstract Syntax Tree) to detect functions/ methods/ 
-    generators/classes in Python source code and to modify source code by 
+    generators/classes in Python source code and modify source code by 
     injecting associated templated docstrings if none detected.
 
     Note: Only non-private functions/ methods are modified. Modification 
@@ -46,7 +46,7 @@ class DocstringInjector(ast.NodeTransformer):
             class node; existing node otherwise
         """
 
-        if not ast.get_docstring(node):
+        if ast.get_docstring(node) is None:
             _expr_node = ast.Expr(value=ast.Str(s=templated_docstring))
             node.body.insert(0, _expr_node) # Insert docstring at the 
                                             # first child node
@@ -99,7 +99,8 @@ class DocstringInjector(ast.NodeTransformer):
                 DocstringInjector._modify_node(node,
                     templated_docstring=CLASS_DOCSTRING_TEMPLATE)
 
-        # Convert the modified AST back to source code
+        # Convert the modified AST back to source code. Note that `_starting_node`
+        # has now been modified.
         modified_source_code = astor.to_source(node=_starting_node)
         return modified_source_code
 
@@ -149,7 +150,11 @@ class DocstringInjector(ast.NodeTransformer):
             print("Modified source succesfully!")
         except (ImportError, IndentationError, SyntaxError):
             raise
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 # TO DO: make this into a command line utility
                            
+# TO DO: inject docstring intelligently. Detect arguments in a function or 
+# class __init__ signature and inject the templated docstring accordingly
+
+
