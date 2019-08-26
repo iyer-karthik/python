@@ -3,15 +3,25 @@
 
 # ### What are partial dependence plots?
 # 
-# In Machine learning there is a recurrent dilemma between performance and interpretation. More complex models usually result in better performance but can black-boxy and hard to interpret. Simpler models like Linear Regression have a straight forward interpretation but tend to suffer from inflexibility. Partial dependence plots (PDPs) help visualize and quanitify the relationship between features and predicted outcomes. They are are particularly helpful with black-box models like Random Forests, Gradient Boosted Trees, Neural Networks where interpretability is an issue. 
+# In Machine learning there is a recurrent dilemma between performance and interpretation. More complex models usually 
+# result in better performance but can black-boxy and hard to interpret. Simpler models like Linear Regression have a 
+# straight forward interpretation but tend to suffer from inflexibility. Partial dependence plots (PDPs) help visualize 
+# and quanitify the relationship between features and predicted outcomes. They are are particularly helpful with 
+# black-box models like Random Forests, Gradient Boosted Trees, Neural Networks where interpretability is an issue. 
 # 
-# PDPs provide a way to look at the directionality of feature(s) with respect to the predicted outcome. Though ensemble methods like random forests and gradient boosted trees give us a way to measure *importance* of features that give a sense of which
+# PDPs provide a way to look at the directionality of feature(s) with respect to the predicted outcome. Though ensemble methods 
+# like random forests and gradient boosted trees give us a way to measure *importance* of features that give a sense of which
 # features tend to have the most effect on the variability of the outcome, they don't give a way to measure the directionality. 
-# For exampe, how does one understand and quanitify the change in a feature on the predicted outcome? Is the change linear or monotonic or possbily non-linear and non-monotonic? In what direction does changing a feature value change the outcome and how? Understanding and quantifying the effect of changing drivers on the outcome is a natural and an important question, and allows for causal interpretation for black-box models
+# For exampe, how does one understand and quanitify the change in a feature on the predicted outcome? Is the change linear 
+# or monotonic or possbily non-linear and non-monotonic? In what direction does changing a feature value change the outcome 
+# and how? Understanding and quantifying the effect of changing drivers on the outcome is a natural and an important question, 
+# and allows for causal interpretation for black-box models
 # 
-# ***Partial dependence plots, introduced by Friedman in 2001, can help in interpreting complex machine learning algorithms by quantifying the directionaity of relationship between the outcome and features.***
+# ***Partial dependence plots, introduced by Friedman in 2001, can help in interpreting complex machine learning algorithms 
+# by quantifying the directionaity of relationship between the outcome and features.***
 # 
-# PDPs help visualize the relationship between a subset of features (typically 1-2) and the response, while accounting for the *average* effect of the other predictors in the model. 
+# PDPs help visualize the relationship between a subset of features (typically 1-2) and the response, while accounting for 
+# the *average* effect of the other predictors in the model. 
 # 
 # ***`sklearn` currently (as of Feb 2019) implements partial dependence plots only for gradient boosted trees.
 # The goal of this project is to extend sklearn's partial dependence functionality to any classifer and any regressor.***
@@ -20,7 +30,8 @@
 
 # The algorithm is deceptively simple. 
 # 
-# Let $x_1$ be the predictor of interest with unique values $\{x_{11}, x_{12}, ...,x_{1l} \}$. Partial dependence plot for $x_1$ is constructed as follows. 
+# Let $x_1$ be the predictor of interest with unique values $\{x_{11}, x_{12}, ...,x_{1l} \}$. Partial dependence plot 
+# for $x_1$ is constructed as follows. 
 # 
 # For $i \in \{1, 2,..,l \}$, 
 # 
@@ -38,17 +49,24 @@
 
 # ### Few words of caution
 
-# In the above algorithm, we can take multiple features and compute the partial dependence function for these features. Taking one feature gives a 1-dimensional curve. Due to limitations of human perception we can take at most 2 features for producing partial dependence plots. 
+# In the above algorithm, we can take multiple features and compute the partial dependence function for these features. 
+# Taking one feature gives a 1-dimensional curve. Due to limitations of human perception we can take at most 2 features 
+# for producing partial dependence plots. 
 # 
 # Note that this requires a pass over the data for each set of joint values of training data or which the partial dependence 
-# function is to be evaluated. This can be computationally intensive. (However, with decision trees partial dependence function can be quickly evaluated from the trees themselves without reference to the data, which is why `sklearn` currently implements
+# function is to be evaluated. This can be computationally intensive. (However, with decision trees partial dependence function 
+# can be quickly evaluated from the trees themselves without reference to the data, which is why `sklearn` currently implements
 # partial dependence function only for gradient boosted trees.)
 # 
-# Also note that partial dependence functions represent the effect of the feature $X_i$ on the prediction *after accounting for the average effects of other variables on the prediction. They are not the effects of $X_i$ on prediction ignoring the effects of other variables.*
+# Also note that partial dependence functions represent the effect of the feature $X_i$ on the prediction *after accounting 
+# for the average effects of other variables on the prediction. They are not the effects of $X_i$ on prediction ignoring the 
+# effects of other variables.*
 
 # ### Example 1
 # 
-# We will use the California housing dataset as an example and walk through the API use to see how partial dependence plots can help in interpretation for regression and classification models. In this first example we will fit two classifiers and try to infer trends from partial dependence plots
+# We will use the California housing dataset as an example and walk through the API use to see how partial dependence plots can 
+# help in interpretation for regression and classification models. In this first example we will fit two classifiers and try 
+# to infer trends from partial dependence plots
 
 # In[1]:
 
@@ -174,10 +192,13 @@ ax.set_xlabel(feature_name)
 # Both the plots caculate the probability of belonging to a particular label as the target feature
 # (`HouseAge`) increases and takes 1000 (`n_grid`) equally spaced values between 5-95 percentile. 
 # 
-# The plots for both the models show similar trend. As the value of the target feature `HouseAge` there is a higher probability of belonging to the class `high`. Or in other words we can conclude:
-# ***Increase in HouseAge results in a higher median price for the house*** Partial Dependence plots can thus help in quantifying the effect of changing a variable on the predicted outcome. 
+# The plots for both the models show similar trend. As the value of the target feature `HouseAge` there is a higher probability 
+# of belonging to the class `high`. Or in other words we can conclude:
+# ***Increase in HouseAge results in a higher median price for the house*** Partial Dependence plots can thus help in quantifying 
+# the effect of changing a variable on the predicted outcome. 
 # 
-# **TL;DR:** The partial dependence plots depend on the model which has been fit, and better the predictive ability of the model, the more confident we can be about inferring correct trends from the plots.
+# **TL;DR:** The partial dependence plots depend on the model which has been fit, and better the predictive ability of the model, 
+# the more confident we can be about inferring correct trends from the plots.
 
 # ### Example 2
 # In this example we will fit two regressors and try to infer trends from the partial dependence plots. 
@@ -285,9 +306,11 @@ ax.set_xlabel(feature_name)
 
 # ***Wait, why is there a difference in the y axis values for the regressor plots?***
 # 
-# We notice similar trends in partial dependence plots for both the models. An increase in `HouseAge` results in decrease of the predicted outcome. Note that the y-axis for the random forest plot is positive but the y-axis for the Gradient Boosted model
+# We notice similar trends in partial dependence plots for both the models. An increase in `HouseAge` results in decrease of 
+# the predicted outcome. Note that the y-axis for the random forest plot is positive but the y-axis for the Gradient Boosted model
 # dips below zero. This is because the predicted function in both the cases is different. *For gradient boosted model, I used 
-# sklearn's implementation which subtracts the mean from the final result, while for the random forest model the predicted function is calculated from scratch and no such subtraction takes place.
+# sklearn's implementation which subtracts the mean from the final result, while for the random forest model the predicted 
+# function is calculated from scratch and no such subtraction takes place.
 
 # ### Future work
 # 
@@ -302,12 +325,6 @@ ax.set_xlabel(feature_name)
 # 3. ***Adding option for standard deviations.*** Include error bars in the plots. 
 # 
 # 4. ***Adding other algorithms.*** Partial dependence plots are global in nature. They use all of training data
-#     to calculate the partial dependence function. We could add other algorithms which are more local in nature (like what the package LIME does)
+#     to calculate the partial dependence function. We could add other algorithms which are more local in nature 
+#     (like what the package LIME does)
 #     
-# 
-
-# In[ ]:
-
-
-
-
