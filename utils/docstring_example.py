@@ -1,19 +1,16 @@
 FUNCTION_DOCSTRING_TEMPLATE = """
-    <One line function description here>
+    One line description of {} here
 
     <More detailed description here>
 
     Parameters
     ----------
-    param1 : <replace by type of parameter> 
-        <Detailed description>
-    param2 : <replace by type of parameter>
-        <Detailed description>
+    {}
 
     Returns
     -------
     return_value : <replace by return value type> 
-        <Detailed description?
+        <Detailed description>
     
     Raises <Include this if function raises errors>
     ------
@@ -41,17 +38,14 @@ FUNCTION_DOCSTRING_TEMPLATE = """
     """
 
 GENERATOR_DOCSTRING_TEMPLATE = """
-    <One line generator description here>
+    One line description of {} here
 
     <More detailed description here>
 
     Parameters
     ----------
-    param1 : <replace by type of parameter> 
-        <More detailed description>
-    param2 : <replace by type of parameter>
-        <More detailed description>
-
+    {}
+    
     Yields 
     ------
     int
