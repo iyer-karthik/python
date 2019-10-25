@@ -165,11 +165,11 @@ class DocstringInjector(ast.NodeTransformer):
         # Only non-private methods/ functions and classes get modified.
         for node in _all_descendent_nodes:
             if isinstance(node, ast.FunctionDef) and not(node.name.startswith('__')):
-                f_name = DocstringInjector.__get_all_function_details(node).name
+                f_name = DocstringInjector.__get_function_name_and_arguments(node).name
 
                 __placeholder = "{} : <replace by type of parameter>\n\t\t<Detailed description>\n    "
                 parameter_template = "".join(__placeholder.format(x)\
-                                        for x in DocstringInjector.__get_all_function_details(node).args )
+                    for x in DocstringInjector.__get_function_name_and_arguments(node).args )
 
                 # Detect if node corresponds to a generator or a normal function
                 if any(isinstance(descendent_node, ast.Yield) for descendent_node in ast.walk(node)):

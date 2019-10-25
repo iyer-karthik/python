@@ -1,5 +1,5 @@
 FUNCTION_DOCSTRING_TEMPLATE = """
-    One line description of {} here
+    One line description of function {} here
 
     <More detailed description here>
 
@@ -16,6 +16,7 @@ FUNCTION_DOCSTRING_TEMPLATE = """
     ------
     AttributeError
         <Some explanation goes here>
+
     ValueError
         <Some explanation goes here>
 
@@ -38,14 +39,14 @@ FUNCTION_DOCSTRING_TEMPLATE = """
     """
 
 GENERATOR_DOCSTRING_TEMPLATE = """
-    One line description of {} here
+    One line description of generator {} here
 
     <More detailed description here>
 
     Parameters
     ----------
     {}
-    
+
     Yields 
     ------
     int
@@ -55,6 +56,7 @@ GENERATOR_DOCSTRING_TEMPLATE = """
     ------
     AttributeError
         <Some explanation goes here>
+
     ValueError
         <Some explanation goes here>
     """
@@ -66,6 +68,7 @@ CLASS_DOCSTRING_TEMPLATE = """
     ----------
     param1 : <replace by type of parameter> 
         <The first parameter. More detailed description>
+
     param2 : <replace by type of parameter>
         <The second parameter. More detailed description>
     
@@ -73,6 +76,7 @@ CLASS_DOCSTRING_TEMPLATE = """
     ----------
     attr1 : <replace by type of parameter> 
         <More detailed description>
+        
     attr2 : <replace by type of parameter> 
         <More detailed description>
     """
