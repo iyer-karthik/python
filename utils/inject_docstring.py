@@ -167,21 +167,24 @@ class DocstringInjector(ast.NodeTransformer):
             if isinstance(node, ast.FunctionDef) and not(node.name.startswith('__')):
                 f_name = DocstringInjector.__get_all_function_details(node).name
 
-                parameter_template = "".join("{} : <replace by type of parameter>\n\t\t<Detailed description>\n    ".format(x)\
+                __placeholder = "{} : <replace by type of parameter>\n\t\t<Detailed description>\n    "
+                parameter_template = "".join(__placeholder.format(x)\
                                         for x in DocstringInjector.__get_all_function_details(node).args )
 
                 # Detect if node corresponds to a generator or a normal function
                 if any(isinstance(descendent_node, ast.Yield) for descendent_node in ast.walk(node)):
-                    __templated_docstring = GENERATOR_DOCSTRING_TEMPLATE.format(f_name, parameter_template)
-                    DocstringInjector.__modify_node(node, 
+                    __templated_docstring = GENERATOR_DOCSTRING_TEMPLATE.format(f_name, 
+                                                                                parameter_template)
+                    DocstringInjector.__modify_node(node=node, 
                                                     templated_docstring=__templated_docstring)
-                else:
-                    __templated_docstring = FUNCTION_DOCSTRING_TEMPLATE.format(f_name, parameter_template)
-                    DocstringInjector.__modify_node(node,
-                                                    templated_docstring=__templated_docstring)
+    
+                __templated_docstring = FUNCTION_DOCSTRING_TEMPLATE.format(f_name, 
+                                                                           parameter_template)
+                DocstringInjector.__modify_node(node=node,
+                                                templated_docstring=__templated_docstring)
                 
             elif isinstance(node, ast.ClassDef):
-                DocstringInjector.__modify_node(node,
+                DocstringInjector.__modify_node(node=node,
                                                 templated_docstring=CLASS_DOCSTRING_TEMPLATE)
 
         # Convert the modified AST back to source code. 
